@@ -1,9 +1,13 @@
-<html>
-  <head>
-    <title>Welcome to Test.com!</title>
-    <link rel="stylesheet" href="Bootstrap/css/bootstrap.min.css">
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
+	<link href="Bootstrap/css/bootstrap.min.css"  rel="stylesheet" >
+	<link href="index.css" rel="stylesheet" />
+</head>
 
-  <body> <h1>Success!  The test.com virtual host is working!</h1>
-  </body>
+<body>
+</body>
 </html>

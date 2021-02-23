@@ -2,4 +2,36 @@ body
 {
   background-color: #004b91;
   color: white;
+  font-family: 'Quicksand', sans-serif;
+}
+
+.circle
+{
+  position: absolute;
+  border-radius: 50%;
+  width: 200px;
+  height: 200px;
+  background: white;
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 200px;
+  margin-left: -100px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -100px;
+}
+
+.tipDrop
+{
+  position: absolute;
+  width: 235px;
+  left: 50%;
+  top: 72%;
+  margin-left: -115px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -100px;
+  border: 1px solid white;
+  background-color: #003566;
+  border-radius: 30px;
+  text-align: center;
+  padding-top:10px;
+  font-size: 12pt;
 }

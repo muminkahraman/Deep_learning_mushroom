@@ -5,6 +5,22 @@ body
   font-family: 'Quicksand', sans-serif;
 }
 
+.modalLink
+{
+  text-decoration: none;
+  color: black;
+}
+
+a.title
+{
+    color: white;
+}
+
+.title
+{
+  text-decoration: none;
+}
+
 .circle
 {
   position: absolute;

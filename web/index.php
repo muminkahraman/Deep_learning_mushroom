@@ -1,3 +1,5 @@
+<?php  include ("fonction.php"); ?>
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -22,19 +24,15 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-12">
-        <h1 style="font-size:60pt;display:inline;">ChampiScan</h1>
+        <a class="title" href="./?accueil=on"><h1 style="font-size:60pt;display:inline;">ChampiScan</h1></a>
         <!--- Modal --->
         <i class="fas fa-bars" style="font-size:30pt; float: right; display:inline; margin-top:40px; margin-right:15px; color: #15008f;" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="float:right;">
           <div class="modal-dialog modal-sm">
             <div class="modal-content">
               <div class="modal-body" style="color:black; text-align: center;">
-                <p>
-                  Galerie
-                </p>
-                <p>
-                  A propos
-                </p>
+                <a class="modalLink" href="./?galerie=on">Galerie</a></br>
+                <a class="modalLink" href="./?apropos=on">A Propos</a>
               </div>
             </div>
           </div>
@@ -43,15 +41,13 @@
       </div>
     </div>
   </div>
-  <div class="container-fluid">
-    <div class="row" style="padding-top:20em">
-      <div class="circle"></div>
-      <div class="tipDrop">
-        <p>
-          Glissez ou cliquez pour déposer une image de champignon.
-        </p>
-      </div>
-    </div>
-  </div>
+<?php
+  if (get("galerie")) include("galerie.php");
+  elseif (get("apropos")) include("apropos.php");
+  elseif (get("infoChampi")) include("infoChampi.php");
+  else include("accueil.php");
+?>
+
+
 </body>
 </html>

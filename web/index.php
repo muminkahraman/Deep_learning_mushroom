@@ -25,14 +25,40 @@
     <div class="row">
       <div class="col-12">
         <a class="title" href="./?accueil=on"><h1 style="font-size:60pt;display:inline;">ChampiScan</h1></a>
-        <!--- Modal --->
-        <i class="fas fa-bars" style="font-size:30pt; float: right; display:inline; margin-top:40px; margin-right:15px; color: #15008f;" data-bs-toggle="modal" data-bs-target="#exampleModal"></i>
-        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" style="float:right;">
-          <div class="modal-dialog modal-sm">
-            <div class="modal-content">
-              <div class="modal-body" style="color:black; text-align: center;">
-                <a class="modalLink" href="./?galerie=on">Galerie</a></br>
-                <a class="modalLink" href="./?apropos=on">A Propos</a>
+        <!--- Dropdown menu --->
+        <i class="fas fa-bars dropdown" style="font-size:30pt; float: right; display:inline; margin-top:40px; margin-right:15px; color: #15008f;" data-bs-toggle="dropdown" aria-expanded="false"></i>
+        <ul class="dropdown-menu">
+          <?php
+                if ($_SERVER['REQUEST_URI'] == "/?accueil=on")
+                {
+                  echo "
+                  <li class='dropdown-item'>
+                  <a class='modalLink' href='./?galerie=on'>Galerie</a></li>
+                  <li class='dropdown-item'>
+                  <a class='modalLink' href='./?apropos=on'>A Propos</a></li></ul>";
+                }
+                elseif ($_SERVER['REQUEST_URI'] == "/?apropos=on")
+                {
+                  echo "
+                  <li class='dropdown-item'>
+                  <a class='modalLink' href='./?accueil=on'>Accueil</a></li>
+                  <li class='dropdown-item'>
+                  <a class='modalLink' href='./?galerie=on'>Galerie</a></li></ul>";
+                }
+                elseif ($_SERVER['REQUEST_URI'] == "/?galerie=on")
+                {
+                  echo "
+                  <li class='dropdown-item'>
+                  <a class='modalLink' href='./?accueil=on'>Accueil</a></li>
+                  <li class='dropdown-item'>
+                  <a class='modalLink' href='./?apropos=on'>A Propos</a></li>";
+                }
+                else echo "<li class='dropdown-item'>
+                <a class='modalLink' href='./?galerie=on'>Galerie</a></li>
+                <li class='dropdown-item'>
+                <a class='modalLink' href='./?apropos=on'>A Propos</a></li></ul>";
+                ?>
+
               </div>
             </div>
           </div>

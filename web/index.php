@@ -6,7 +6,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-  <link href="Bootstrap/css/bootstrap.min.css"  rel="stylesheet" >
+  <link href="Bootstrap/css/bootstrap.css"  rel="stylesheet" >
   <link href="index.css" rel="stylesheet" />
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css">
 
@@ -26,7 +26,9 @@
       <div class="col-12">
         <a class="title" href="./?accueil=on"><h1 style="font-size:60pt;display:inline;">ChampiScan</h1></a>
         <!--- Dropdown menu --->
-        <i class="fas fa-bars dropdown" style="font-size:30pt; float: right; display:inline; margin-top:40px; margin-right:15px; color: #15008f;" data-bs-toggle="dropdown" aria-expanded="false"></i>
+        <i class="fas fa-bars" style="font-size:30pt; float: right; display:inline; margin-top:40px; margin-right:15px; color: #15008f;" data-bs-toggle="dropdown" aria-expanded="false"></i>
+
+
         <ul class="dropdown-menu">
           <?php
                 if ($_SERVER['REQUEST_URI'] == "/?accueil=on")

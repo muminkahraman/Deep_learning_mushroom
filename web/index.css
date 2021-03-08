@@ -40,13 +40,28 @@ a.title
   border-radius: 50%;
   width: 200px;
   height: 200px;
-  background: white;
   left: 50%;
   top: 50%;
+  margin-left: -100px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -100px;
+}
+
+.white
+{
+  background: white;
   width: 200px;
   height: 200px;
   margin-left: -100px; /* Cette valeur doit être la moitié négative de la valeur du width */
   margin-top: -100px;
+}
+
+.back
+{
+  background: #2D9AFF;
+  width: 275px;
+  height: 275px;
+  margin-left: -137.5px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -137.5px;
 }
 
 .tipDrop
@@ -54,7 +69,7 @@ a.title
   position: absolute;
   width: 235px;
   left: 50%;
-  top: 72%;
+  top: 75%;
   margin-left: -115px; /* Cette valeur doit être la moitié négative de la valeur du width */
   margin-top: -100px;
   border: 1px solid white;
@@ -65,27 +80,11 @@ a.title
   font-size: 12pt;
 }
 
-.bars {
-  display: inline-block;
-  cursor: pointer;
-}
-
-.bar1, .bar2, .bar3 {
-  width: 35px;
-  height: 5px;
-  background-color: #333;
-  margin: 6px 0;
-  transition: 0.4s;
-}
-
-.change .bar1 {
-  -webkit-transform: rotate(-45deg) translate(-9px, 6px);
-  transform: rotate(-45deg) translate(-9px, 6px);
-}
-
-.change .bar2 {opacity: 0;}
-
-.change .bar3 {
-  -webkit-transform: rotate(45deg) translate(-8px, -8px);
-  transform: rotate(45deg) translate(-8px, -8px);
+footer
+{
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   text-align: center;
 }

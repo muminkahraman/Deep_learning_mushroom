@@ -5,19 +5,63 @@ body
   font-family: 'Quicksand', sans-serif;
 }
 
+.modalLink
+{
+  text-decoration: none;
+  color: black;
+}
+
+a.title
+{
+    color: white;
+}
+
+.title
+{
+  text-decoration: none;
+}
+
+.title1
+{
+  color:#15008f;
+  text-align: center;
+  font-size: 50pt;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+.textAPropos
+{
+  text-align: center;
+}
 .circle
 {
   position: absolute;
   border-radius: 50%;
   width: 200px;
   height: 200px;
-  background: white;
   left: 50%;
   top: 50%;
+  margin-left: -100px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -100px;
+}
+
+.white
+{
+  background: white;
   width: 200px;
   height: 200px;
   margin-left: -100px; /* Cette valeur doit être la moitié négative de la valeur du width */
   margin-top: -100px;
+}
+
+.back
+{
+  background: #2D9AFF;
+  width: 275px;
+  height: 275px;
+  margin-left: -137.5px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -137.5px;
 }
 
 .tipDrop
@@ -25,7 +69,7 @@ body
   position: absolute;
   width: 235px;
   left: 50%;
-  top: 72%;
+  top: 75%;
   margin-left: -115px; /* Cette valeur doit être la moitié négative de la valeur du width */
   margin-top: -100px;
   border: 1px solid white;
@@ -34,4 +78,13 @@ body
   text-align: center;
   padding-top:10px;
   font-size: 12pt;
+}
+
+footer
+{
+   position: fixed;
+   left: 0;
+   bottom: 0;
+   width: 100%;
+   text-align: center;
 }

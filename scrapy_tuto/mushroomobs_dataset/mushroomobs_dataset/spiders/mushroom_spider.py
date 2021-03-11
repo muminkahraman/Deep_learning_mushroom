@@ -17,10 +17,20 @@ class Mushroom_spider(scrapy.Spider):
                 'obervation_link': result.css('div.rss-what a::attr(href)').get()
             }
 
-        next_page = response.css('div.results ul.pagination a::attr(href)').get()
+        crawled_pages = []
+        candidate_pages = response.css('div.results ul.pagination a::attr(href)').getall()
+        next_pages = []
 
-        if next_page is not None:
-            next_page = response.urljoin(next_page)
-            yield scrapy.Request(next_page, callback=self.parse)
+        #checks that the candidate links haven't been crawled already, to avoid cycles
+
+        for page in candidate_pages:
+            if crawled_pages.count(page) == 0:
+                next_pages.append(page)
+
+        for page in next_pages:
+            if page is not None:
+                page = response.urljoin(page)
+                yield scrapy.Request(page, callback=self.parse)
+
 
 

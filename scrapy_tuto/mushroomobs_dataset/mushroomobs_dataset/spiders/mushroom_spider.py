@@ -17,6 +17,10 @@ class Mushroom_spider(scrapy.Spider):
                 'obervation_link': result.css('div.rss-what a::attr(href)').get()
             }
 
+        next_page = response.css('div.results ul.pagination a::attr(href)').get()
 
+        if next_page is not None:
+            next_page = response.urljoin(next_page)
+            yield scrapy.Request(next_page, callback=self.parse)
 
 

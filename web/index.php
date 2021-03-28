@@ -19,19 +19,19 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.6.0/dist/umd/popper.min.js" integrity="sha384-KsvD1yqQ1/1+IA7gi3P0tyJcT3vR+NdBTt13hSJ2lnve8agRGXTTyNaBYmCR/Nwi" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.min.js" integrity="sha384-nsg8ua9HAw1y0W1btsyWgBklPnCUAFLuTMS2G72MMONqmOymq585AcH49TLBQObG" crossorigin="anonymous"></script>
 
-
 </head>
 <body>
   <div class="container-fluid">
     <div class="row">
-      <div class="col-8">
-        <a class="title" href="./?accueil=on"><h1 class="display-1">ChampiScan</h1></a>
+      <div class="col-10">
+        <img draggable="false" style="width: 150px; float:left; display: inline-block;" src="ressources/image/shroom.png"/>
+        <a draggable="false" class="title" href="./?accueil=on"><h1 class="display-1" style="margin-top:30px;">Mushing Learning</h1></a>
         <!--- Dropdown menu --->
       </div>
-      <div class="col-3"></div>
+      <div class="col-1"></div>
       <div class="col-1">
-        <a href="#"  data-bs-toggle="dropdown" aria-expanded="false" style="float: right; height:75px;display:absolute;  text-decoration:none">
-          <i class="fas fa-bars" style="font-size:30pt; float: right; display:inline; margin-top:40px; margin-right:15px; color: #15008f;">
+        <a href="#"  data-bs-toggle="dropdown" style="float: right; height:45px;width: 45px;display:absolute;  text-decoration:none; margin-top:55px;">
+          <i draggable="false" class="fas fa-bars" style="font-size:30pt; float: right; display:inline; margin-top:-2px; margin-right:15px; color: #15008f;">
           </i>
         </a>
 
@@ -79,7 +79,7 @@
 <?php
 if (get("galerie")) include("galerie.php");
 elseif (get("apropos")) include("apropos.php");
-elseif (get("infoChampi")) include("infoChampi.php");
+elseif (get("infoMush")) include("infoMush.php");
 else include("accueil.php");
 ?>
 

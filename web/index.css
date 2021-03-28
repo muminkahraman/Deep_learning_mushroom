@@ -13,7 +13,7 @@ body
 
 a.title
 {
-    color: white;
+  color: white;
 }
 
 .title
@@ -53,15 +53,28 @@ a.title
   height: 200px;
   margin-left: -100px; /* Cette valeur doit être la moitié négative de la valeur du width */
   margin-top: -100px;
+  padding: 0;
+}
+
+.shroom
+{
+  float: left;
+  width: 250px;
+  position: absolute;
+  width: 250px;
+  left: 50%;
+  top: 50%;
+  margin-left: -130px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -125px;
 }
 
 .back
 {
   background: #2D9AFF;
-  width: 275px;
-  height: 275px;
-  margin-left: -137.5px; /* Cette valeur doit être la moitié négative de la valeur du width */
-  margin-top: -137.5px;
+  width: 250px;
+  height: 250px;
+  margin-left: -125px; /* Cette valeur doit être la moitié négative de la valeur du width */
+  margin-top: -125px;
 }
 
 .tipDrop
@@ -82,9 +95,22 @@ a.title
 
 footer
 {
-   position: fixed;
-   left: 0;
-   bottom: 0;
-   width: 100%;
-   text-align: center;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  margin-top: 10px;
+  background-color: #00305C;
+}
+input[type='file']{
+
+  height:200px;
+  width:200px;
+  position:absolute;
+  top:0;
+  left:0;
+  opacity:0;
+  cursor:pointer;
+
 }

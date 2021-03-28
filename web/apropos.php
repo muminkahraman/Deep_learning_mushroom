@@ -12,9 +12,6 @@
         Integer ullamcorper nunc quis lacus aliquet pretium. Sed nibh orci, malesuada quis tellus nec, tincidunt varius neque. Quisque hendrerit ante eget cursus porta. Donec eros ipsum, posuere at cursus egestas, vestibulum pellentesque turpis. Proin massa urna, aliquet blandit velit in, malesuada convallis massa. Nunc vehicula nunc vel tempus rutrum. Ut pretium odio ut dolor accumsan, vel lobortis purus vestibulum.
         Fusce odio nibh, aliquam vel molestie non, tincidunt rutrum augue. Integer sodales hendrerit mauris sed tempor. Sed venenatis convallis porta.
       </p>
-      <p class="textAPropos">
-        Integer non diam mattis, efficitur nisl scelerisque, suscipit eros. Nullam consequat lobortis hendrerit. Mauris accumsan in orci nec tincidunt. Morbi non fermentum nunc. Maecenas sollicitudin blandit massa, nec faucibus leo malesuada vel. Interdum et malesuada fames ac ante ipsum primis in faucibus. Ut velit ex, accumsan id sollicitudin vel, gravida sed dolor. Sed eget congue risus. Aliquam lobortis gravida justo, vel laoreet libero mattis eget. Proin luctus sem nec tellus ultrices viverra.
-      </p>
     </div>
     <div class="col-2"></div>
   </div>

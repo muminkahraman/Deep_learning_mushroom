@@ -93,6 +93,23 @@ a.title
   font-size: 12pt;
 }
 
+.modal
+{
+  color: black;
+}
+
+.grid
+{
+  color: black;
+}
+
+.logo
+{
+  width: 150px;
+  float:left;
+  display: inline-block;
+}
+
 footer
 {
   position: fixed;

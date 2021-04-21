@@ -95,3 +95,18 @@ def test():
         l.append(i)
     print(l)
     print(len(l))
+
+def json_nom():
+    with open ('liens.csv', newline='') as csvfile:
+        f = open("champName.json", "w")
+        mondoc = csv.DictReader(csvfile)
+        noms = []
+        lines = []
+        for ligne in mondoc:
+            noms.append(ligne['name'])
+        for nom in noms:
+            if ('{\n\t"Name":"' + nom + '"\n}\n') not in lines:
+                lines.append('{\n\t"Name":"' + nom + '"\n}\n')
+        f.writelines(lines)
+        f.close()
+            

@@ -3,12 +3,12 @@ from pathlib import Path
 import shutil
 
 
-base_dir = r'D:\Images\Projet champi\Champis'
+base_dir = r'../dataset/brut/'
 for mush in os.listdir(base_dir):
 
-    source1 = r'\train'
+    source1 = r'/train'
     source1 = os.path.join(base_dir, mush) + source1
-    source2 = r'\test'
+    source2 = r'/test'
     source2 = os.path.join(base_dir, mush) + source2
     target = os.path.join(base_dir, mush)
     for file in os.listdir(source1):

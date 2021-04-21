@@ -1,10 +1,12 @@
-import os, sys
+import os
 import shutil
-import pandas as pd
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+import pandas as pd
 import tensorflow as tf
+from PIL import Image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # A modifier en fonction de où sont rangées les photos

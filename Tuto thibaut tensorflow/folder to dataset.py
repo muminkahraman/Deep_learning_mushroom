@@ -56,18 +56,29 @@ def resize(source_path, target_path):
 
 def create_dataset(val_split, clrmd):
     print("started creating dataset")
-    train = tf.keras.preprocessing.image_dataset_from_directory(
+    train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
             target, labels='inferred', color_mode=clrmd, image_size=(480, 480),
             validation_split=val_split, subset='training', seed=3
     )
 
-    validation = tf.keras.preprocessing.image_dataset_from_directory(
+    validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
         target, labels='inferred', color_mode=clrmd, image_size=(480, 480),
         validation_split=val_split, subset='validation', seed=3
     )
+
+    val_batches = tf.data.experimental.cardinality(validation_dataset)
+    test_dataset = validation_dataset.take(val_batches)
+    validation_dataset = validation_dataset.skip(val_batches)
+
     print("finished creating dataset")
 
-    return train, validation
+    AUTOTUNE = tf.data.AUTOTUNE
+
+    train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
+    validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
+    test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
+
+    return train_dataset, test_dataset, validation_dataset
 
 # Pour vérifier que la création du dataset s'est bien passée
 # count limité à 32 à cause da la taille des batchs...
@@ -85,18 +96,7 @@ def show_sample(ds,count):
             plt.axis("off")
     plt.show()
 
-train_dataset, validation_dataset = create_dataset(.8, 'rgb')
-
-
-val_batches = tf.data.experimental.cardinality(validation_dataset)
-test_dataset = validation_dataset.take(val_batches)
-validation_dataset = validation_dataset.skip(val_batches)
-
-AUTOTUNE = tf.data.AUTOTUNE
-
-train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
-validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
-test_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
+train_dataset, test_datasetn, validation_dataset = create_dataset(.8, 'rgb')
 
 data_augmentation = tf.keras.Sequential([
     tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
@@ -117,4 +117,5 @@ def show_shuffled_sample(ds):
 
     plt.show()
 
+preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 

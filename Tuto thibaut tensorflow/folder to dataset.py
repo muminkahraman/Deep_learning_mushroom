@@ -14,6 +14,8 @@ base_dir = r'D:\Images\Projet champi\Total'
 target = r'D:\Images\Projet champi\Champis_resized'
 labels = os.listdir(target)
 
+IMG_SIZE = (224,224)
+IMG_SHAPE = IMG_SIZE + (3,)
 
 # Un peu inutile car cette fonctionnalité est incluse
 # dans la fonction image_dataset_from_directory...
@@ -57,12 +59,12 @@ def resize(source_path, target_path):
 def create_dataset(val_split, clrmd):
     print("started creating dataset")
     train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
-            target, labels='inferred', color_mode=clrmd, image_size=(480, 480),
+            target, labels='inferred', color_mode=clrmd, image_size=IMG_SIZE,
             validation_split=val_split, subset='training', seed=3
     )
 
     validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
-        target, labels='inferred', color_mode=clrmd, image_size=(480, 480),
+        target, labels='inferred', color_mode=clrmd, image_size=IMG_SIZE,
         validation_split=val_split, subset='validation', seed=3
     )
 
@@ -72,11 +74,16 @@ def create_dataset(val_split, clrmd):
 
     print("finished creating dataset")
 
+    #Cette partie est censée optimiser l'accès aux données,
+    # mais elle empêche leur affichage...
+
+    '''
     AUTOTUNE = tf.data.AUTOTUNE
 
     train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
     test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
+    '''
 
     return train_dataset, test_dataset, validation_dataset
 
@@ -88,7 +95,7 @@ def show_sample(ds,count):
     class_names = ds.class_names
 
     plt.figure(figsize=(10, 10))
-    for images, labels in train_dataset.take(1):
+    for images, labels in ds.take(1):
         for i in range(count):
             ax = plt.subplot(3, 3, i + 1)
             plt.imshow(images[i].numpy().astype("uint8"))
@@ -96,15 +103,12 @@ def show_sample(ds,count):
             plt.axis("off")
     plt.show()
 
-train_dataset, test_datasetn, validation_dataset = create_dataset(.8, 'rgb')
-
-data_augmentation = tf.keras.Sequential([
-    tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
-    tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
-)
-
-
 def show_shuffled_sample(ds):
+
+    data_augmentation = tf.keras.Sequential([
+        tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
+    )
 
     for image, _ in ds.take(1):
       plt.figure(figsize=(10, 10))
@@ -117,5 +121,48 @@ def show_shuffled_sample(ds):
 
     plt.show()
 
-preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 
+def create_model(ds):
+    print("Start creating model")
+    preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
+
+    data_augmentation = tf.keras.Sequential([
+        tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
+    )
+
+    base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
+                                                   include_top=False,
+                                                   weights='imagenet')
+
+    image_batch, label_batch = next(iter(ds))
+    feature_batch = base_model(image_batch)
+
+    base_model.trainable = False
+
+    global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
+    feature_batch_average = global_average_layer(feature_batch)
+
+    prediction_layer = tf.keras.layers.Dense(1)
+    prediction_batch = prediction_layer(feature_batch_average)
+
+    inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
+    x = data_augmentation(inputs)
+    x = preprocess_input(x)
+    x = base_model(x, training=False)
+    x = global_average_layer(x)
+    x = tf.keras.layers.Dropout(0.2)(x)
+    outputs = prediction_layer(x)
+    model = tf.keras.Model(inputs, outputs)
+
+    print("Finished creating model")
+
+    return model
+
+
+train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
+
+model = create_model(train_dataset)
+
+show_sample(train_dataset, 9)
+show_shuffled_sample(train_dataset)

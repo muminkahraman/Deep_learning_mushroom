@@ -72,21 +72,49 @@ def create_dataset(val_split, clrmd):
 # Pour vérifier que la création du dataset s'est bien passée
 # count limité à 32 à cause da la taille des batchs...
 
+
 def show_sample(ds,count):
-    plt.figure(figsize=(8,8))
-    for image, index in ds.take(1):
+    class_names = ds.class_names
+
+    plt.figure(figsize=(10, 10))
+    for images, labels in train_dataset.take(1):
         for i in range(count):
-            plt.subplot(8,4,i+1)
-            plt.xticks([])
-            plt.yticks([])
-            plt.grid(False)
-            plt.imshow(image[i].numpy(), cmap=plt.get_cmap("gray"))
-            plt.xlabel(labels[index[i]])
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title(class_names[labels[i]])
+            plt.axis("off")
     plt.show()
 
-train, test = create_dataset(.8, 'grayscale')
-show_sample(train, 32)
+train_dataset, validation_dataset = create_dataset(.8, 'rgb')
 
 
+val_batches = tf.data.experimental.cardinality(validation_dataset)
+test_dataset = validation_dataset.take(val_batches)
+validation_dataset = validation_dataset.skip(val_batches)
+
+AUTOTUNE = tf.data.AUTOTUNE
+
+train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
+validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
+test_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
+
+data_augmentation = tf.keras.Sequential([
+    tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+    tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
+)
+
+
+def show_shuffled_sample(ds):
+
+    for image, _ in ds.take(1):
+      plt.figure(figsize=(10, 10))
+      first_image = image[0]
+      for i in range(9):
+        ax = plt.subplot(3, 3, i + 1)
+        augmented_image = data_augmentation(tf.expand_dims(first_image, 0))
+        plt.imshow(augmented_image[0] / 255)
+        plt.axis('off')
+
+    plt.show()
 
 

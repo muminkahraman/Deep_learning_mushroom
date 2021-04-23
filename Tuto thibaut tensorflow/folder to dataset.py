@@ -70,6 +70,7 @@ def create_dataset(val_split, clrmd):
         validation_split=val_split, subset='validation', seed=3
     )
 
+    #Validation_dataset est vide, à changer
     val_batches = tf.data.experimental.cardinality(validation_dataset)
     test_dataset = validation_dataset.take(val_batches)
     validation_dataset = validation_dataset.skip(val_batches)
@@ -79,13 +80,13 @@ def create_dataset(val_split, clrmd):
     #Cette partie est censée optimiser l'accès aux données,
     # mais elle empêche leur affichage...
 
-    '''
+
     AUTOTUNE = tf.data.AUTOTUNE
 
     train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
     test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
-    '''
+
 
     return train_dataset, test_dataset, validation_dataset
 
@@ -160,6 +161,8 @@ def create_model(ds):
     print("Compiling model")
 
     base_learning_rate = 0.0001
+
+    #Voir si on peut changer la fonction de perte
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=base_learning_rate),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
@@ -178,3 +181,4 @@ initial_epochs = 10
 history = model.fit(train_dataset,
           validation_data=validation_dataset,
           epochs=initial_epochs)
+

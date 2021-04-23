@@ -25,14 +25,14 @@ IMG_SHAPE = IMG_SIZE + (3,)
 def resize(source_path, target_path):
     count = 0
     size = (480, 480)
-    labels = os.listdir(source_path)
+    lab = os.listdir(source_path)
 
     try:
         os.mkdir(target_path)
     except (FileExistsError):
         pass
 
-    for mush_name in labels:
+    for mush_name in lab:
         count+=1
         wd = os.path.join(source_path, mush_name)
         target_dir = os.path.join(target_path, mush_name)
@@ -52,7 +52,7 @@ def resize(source_path, target_path):
         except FileExistsError:
             pass
 
-        print(str(count/len(labels) * 100 ) + " effectués !")
+        print(str(count/len(lab) * 100 ) + " effectués !")
 
 # clrmd = 'rgb' ou 'grayscale' ou 'rgba', valsplit donne la fraction de donnée qui part
 # dans le training ou le testing, en fonction de l'argument "subset"
@@ -142,7 +142,8 @@ def create_model(ds):
 
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
 
-    prediction_layer = tf.keras.layers.Dense(443, activation=tf.keras.activations.sigmoid)
+
+    prediction_layer = tf.keras.layers.Dense(len(ds.class_names), activation=tf.keras.activations.softmax)
 
     inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
 
@@ -160,7 +161,7 @@ def create_model(ds):
 
     base_learning_rate = 0.0001
     model.compile(optimizer=tf.keras.optimizers.Adam(lr=base_learning_rate),
-                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
 
     print(model.summary())
@@ -174,3 +175,6 @@ model = create_model(train_dataset)
 
 initial_epochs = 10
 
+history = model.fit(train_dataset,
+          validation_data=validation_dataset,
+          epochs=initial_epochs)

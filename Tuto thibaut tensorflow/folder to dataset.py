@@ -133,38 +133,44 @@ def create_model(ds):
         tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
     )
 
+    #Ici on importe MobileNetV2 et on le gèle
     base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
                                                    include_top=False,
                                                    weights='imagenet')
 
-    image_batch, label_batch = next(iter(ds))
-    feature_batch = base_model(image_batch)
-
     base_model.trainable = False
 
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
-    feature_batch_average = global_average_layer(feature_batch)
 
-    prediction_layer = tf.keras.layers.Dense(1)
-    prediction_batch = prediction_layer(feature_batch_average)
+    prediction_layer = tf.keras.layers.Dense(443, activation=tf.keras.activations.sigmoid)
 
     inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
+
     x = data_augmentation(inputs)
     x = preprocess_input(x)
     x = base_model(x, training=False)
     x = global_average_layer(x)
     x = tf.keras.layers.Dropout(0.2)(x)
-    outputs = prediction_layer(x)
-    model = tf.keras.Model(inputs, outputs)
+    output = prediction_layer(x)
+
+    model = tf.keras.Model(inputs, output)
 
     print("Finished creating model")
+    print("Compiling model")
 
+    base_learning_rate = 0.0001
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=base_learning_rate),
+                  loss=tf.keras.losses.BinaryCrossentropy(from_logits=True),
+                  metrics=['accuracy'])
+
+    print(model.summary())
     return model
+
 
 
 train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
 
 model = create_model(train_dataset)
 
-show_sample(train_dataset, 9)
-show_shuffled_sample(train_dataset)
+initial_epochs = 10
+

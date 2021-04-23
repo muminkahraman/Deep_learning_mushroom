@@ -12,8 +12,8 @@ from tensorflow.keras.preprocessing.image import ImageDataGenerator
 # A modifier en fonction de où sont rangées les photos
 
 
-base_dir = r'D:\Images\Projet champi\Total'
-target = r'D:\Images\Projet champi\Champis_resized'
+base_dir = '../dataset/brut/'
+target = '../dataset/resized/'
 labels = os.listdir(target)
 
 IMG_SIZE = (224,224)

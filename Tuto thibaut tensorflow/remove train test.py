@@ -3,14 +3,16 @@ from pathlib import Path
 import shutil
 
 #  RAJOUTER DES JOIN
+base_dir = r'D:\Documents\Cours\L3 INFO\LIFPROJET\dataset\brut'
 
-base_dir = '../dataset/brut/'
 for mush in os.listdir(base_dir):
 
-    source1 = '/train'
-    source1 = os.path.join(base_dir, mush) + source1
-    source2 = '/test'
-    source2 = os.path.join(base_dir, mush) + source2
+    train = "train/"
+    test = "test/"
+    source = os.path.join(base_dir, mush)
+    source1 = os.path.join(source, train)
+    source2 = os.path.join(source, test)
+
     target = os.path.join(base_dir, mush)
     for file in os.listdir(source1):
         shutil.move(os.path.join(source1, file), target)

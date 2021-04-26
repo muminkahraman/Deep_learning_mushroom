@@ -7,13 +7,12 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from PIL import Image
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # A modifier en fonction de où sont rangées les photos
 
 
 base_dir = '../dataset/brut/'
-target = '../dataset/resized/'
+target = r'D:\Images\Projet champi\resized'
 labels = os.listdir(target)
 
 IMG_SIZE = (224,224)
@@ -80,13 +79,13 @@ def create_dataset(val_split, clrmd):
     #Cette partie est censée optimiser l'accès aux données,
     # mais elle empêche leur affichage...
 
-
+    '''
     AUTOTUNE = tf.data.AUTOTUNE
 
     train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
     test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
-
+    '''
 
     return train_dataset, test_dataset, validation_dataset
 
@@ -170,15 +169,35 @@ def create_model(ds):
     print(model.summary())
     return model
 
-
-
 train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
 
 model = create_model(train_dataset)
 
-initial_epochs = 10
+initial_epochs = 2
 
 history = model.fit(train_dataset,
           validation_data=validation_dataset,
           epochs=initial_epochs)
 
+acc = history.history['accuracy']
+
+loss = history.history['loss']
+
+plt.figure(figsize=(8, 8))
+plt.subplot(2, 1, 1)
+plt.plot(acc, label='Training Accuracy')
+plt.legend(loc='lower right')
+plt.ylabel('Accuracy')
+plt.ylim([min(plt.ylim()),1])
+plt.title('Training Accuracy')
+
+plt.subplot(2, 1, 2)
+plt.plot(loss, label='Training Loss')
+plt.legend(loc='upper right')
+plt.ylabel('Cross Entropy')
+plt.ylim([0,1.0])
+plt.title('Training Loss')
+plt.xlabel('epoch')
+plt.show()
+
+model.save('saved_model/my_model')

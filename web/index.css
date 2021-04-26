@@ -112,7 +112,6 @@ a.title
 
 footer
 {
-  
   left: 0;
   bottom: 0;
   width: 100%;
@@ -120,6 +119,8 @@ footer
   margin-top: 10px;
   background-color: #00305C;
 }
+
+
 input[type='file']{
 
   height:200px;

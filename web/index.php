@@ -83,11 +83,14 @@ elseif (get("infoMush")) include("infoMush.php");
 else include("accueil.php");
 ?>
 
-
-<footer class="footer">
-  <div class="container-fluid">
-    <h5>Projet sur le Machine Learning. Site web créé par Logan Moriniere.</h5>
+<footer class="navbar fixed-bottom text-center">
+  <div class="col-3">
   </div>
+    <div class="col-6">
+      <h5>Site web conçu pour LIFPROJET.</h5>
+    </div>
+    <div class="col-3">
+    </div>
 </footer>
 </body>
 </html>

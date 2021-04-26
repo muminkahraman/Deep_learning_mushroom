@@ -10,31 +10,25 @@ try {
 } catch(PDOException $e) {
   echo "Connection failed: " . $e->getMessage();
 }
- ?>
-
-<div class="container-fluid">
-  <div class="row mx-auto mt-3" style="width:40%;">
-    <input class="bar" id="search" onkeyup="mushSearch()" type="text" placeholder=" Search" />
-  </div>
-</div>
+?>
 
 <?php
 if(isset($_GET['letter']) && !empty($_GET['letter'])){
-    $letter = strip_tags($_GET['letter']);
+  $letter = strip_tags($_GET['letter']);
 }else{
-    $letter = "A";
+  $letter = "A";
 }
 
 $alphas = range('A', 'Z');
 echo '
 <div style="height:50px;"></div>
 <nav aria-label="Page navigation example">
-  <ul class="pagination justify-content-center">';
-    foreach ($alphas as $a) {
-      echo '<li class="page-item"><a class="page-link" href="./?galerie=on&letter='.$a.'">'.$a.'</a></li>';
-    }
-    echo'
-  </ul>
+<ul class="pagination justify-content-center">';
+foreach ($alphas as $a) {
+  echo '<li class="page-item"><a class="page-link" href="./?galerie=on&letter='.$a.'">'.$a.'</a></li>';
+}
+echo'
+</ul>
 </nav>';
 
 
@@ -43,10 +37,10 @@ $req= $conn->query('Select * from list_mush where mushroom like "'.$letter.'%" o
 echo "<div class='container-fluid'>";
 while($data = $req->fetch())
 {
-  echo "<div class='row'>'<div class='col-3'></div> <div class='col-6 text-center'><a href='#' class='text-white fs-4 text' style='text-decoration:none;'> ".$data[0]."  </a></div> <div class='col-3'></div></div>";
+  echo "<div class='row'><div class='col-3'></div> <div class='col-6 text-center'><a href='#' class='text-white fs-4 text' style='text-decoration:none;'> ".$data[0]."  </a></div> <div class='col-3'></div></div>";
 }
 
-
+$req=null;
 $conn = null;
 ?>
 </div>

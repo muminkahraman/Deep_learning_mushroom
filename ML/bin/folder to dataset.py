@@ -173,7 +173,7 @@ train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
 
 model = create_model(train_dataset)
 
-initial_epochs = 2
+initial_epochs = 1
 
 history = model.fit(train_dataset,
           validation_data=validation_dataset,
@@ -200,4 +200,4 @@ plt.title('Training Loss')
 plt.xlabel('epoch')
 plt.show()
 
-model.save('saved_model/my_model')
+model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\my_model')

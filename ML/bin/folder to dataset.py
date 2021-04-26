@@ -69,23 +69,23 @@ def create_dataset(val_split, clrmd):
         validation_split=val_split, subset='validation', seed=3
     )
 
-    #Validation_dataset est vide, à changer
+
     val_batches = tf.data.experimental.cardinality(validation_dataset)
-    test_dataset = validation_dataset.take(val_batches)
-    validation_dataset = validation_dataset.skip(val_batches)
+    test_dataset = validation_dataset.take(val_batches // 5)
+    validation_dataset = validation_dataset.skip(val_batches // 5)
 
     print("finished creating dataset")
 
     #Cette partie est censée optimiser l'accès aux données,
     # mais elle empêche leur affichage...
 
-    '''
+
     AUTOTUNE = tf.data.AUTOTUNE
 
     train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
     test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
-    '''
+
 
     return train_dataset, test_dataset, validation_dataset
 
@@ -143,7 +143,7 @@ def create_model(ds):
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
 
 
-    prediction_layer = tf.keras.layers.Dense(len(ds.class_names), activation=tf.keras.activations.softmax)
+    prediction_layer = tf.keras.layers.Dense(443, activation=tf.keras.activations.softmax)
 
     inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
 
@@ -169,35 +169,40 @@ def create_model(ds):
     print(model.summary())
     return model
 
-train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
+train_dataset, test_dataset, validation_dataset = create_dataset(.2, 'rgb')
 
 model = create_model(train_dataset)
 
-initial_epochs = 1
+initial_epochs = 20
 
 history = model.fit(train_dataset,
           validation_data=validation_dataset,
           epochs=initial_epochs)
 
 acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
 
 loss = history.history['loss']
+val_loss = history.history['val_loss']
 
 plt.figure(figsize=(8, 8))
 plt.subplot(2, 1, 1)
 plt.plot(acc, label='Training Accuracy')
+plt.plot(val_acc, label='Validation Accuracy')
 plt.legend(loc='lower right')
 plt.ylabel('Accuracy')
 plt.ylim([min(plt.ylim()),1])
-plt.title('Training Accuracy')
+plt.title('Training and Validation Accuracy')
 
 plt.subplot(2, 1, 2)
 plt.plot(loss, label='Training Loss')
+plt.plot(val_loss, label='Validation Loss')
 plt.legend(loc='upper right')
 plt.ylabel('Cross Entropy')
 plt.ylim([0,1.0])
-plt.title('Training Loss')
+plt.title('Training and Validation Loss')
 plt.xlabel('epoch')
 plt.show()
+
 
 model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\my_model')

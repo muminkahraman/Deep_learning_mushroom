@@ -1,19 +1,23 @@
-import os, sys
+import os
 import shutil
-import pandas as pd
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-from PIL import Image
+import pandas as pd
 import tensorflow as tf
+from PIL import Image
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 # A modifier en fonction de où sont rangées les photos
 
 
-base_dir = r'D:\Images\Projet champi\Total'
-target = r'D:\Images\Projet champi\Champis_resized'
+base_dir = '../dataset/brut/'
+target = '../dataset/resized/'
 labels = os.listdir(target)
 
+IMG_SIZE = (224,224)
+IMG_SHAPE = IMG_SIZE + (3,)
 
 # Un peu inutile car cette fonctionnalité est incluse
 # dans la fonction image_dataset_from_directory...
@@ -21,14 +25,14 @@ labels = os.listdir(target)
 def resize(source_path, target_path):
     count = 0
     size = (480, 480)
-    labels = os.listdir(source_path)
+    lab = os.listdir(source_path)
 
     try:
         os.mkdir(target_path)
     except (FileExistsError):
         pass
 
-    for mush_name in labels:
+    for mush_name in lab:
         count+=1
         wd = os.path.join(source_path, mush_name)
         target_dir = os.path.join(target_path, mush_name)
@@ -48,7 +52,7 @@ def resize(source_path, target_path):
         except FileExistsError:
             pass
 
-        print(str(count/len(labels) * 100 ) + " effectués !")
+        print(str(count/len(lab) * 100 ) + " effectués !")
 
 # clrmd = 'rgb' ou 'grayscale' ou 'rgba', valsplit donne la fraction de donnée qui part
 # dans le training ou le testing, en fonction de l'argument "subset"
@@ -56,37 +60,125 @@ def resize(source_path, target_path):
 
 def create_dataset(val_split, clrmd):
     print("started creating dataset")
-    train = tf.keras.preprocessing.image_dataset_from_directory(
-            target, labels='inferred', color_mode=clrmd, image_size=(480, 480),
+    train_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+            target, labels='inferred', color_mode=clrmd, image_size=IMG_SIZE,
             validation_split=val_split, subset='training', seed=3
     )
 
-    validation = tf.keras.preprocessing.image_dataset_from_directory(
-        target, labels='inferred', color_mode=clrmd, image_size=(480, 480),
+    validation_dataset = tf.keras.preprocessing.image_dataset_from_directory(
+        target, labels='inferred', color_mode=clrmd, image_size=IMG_SIZE,
         validation_split=val_split, subset='validation', seed=3
     )
+
+    #Validation_dataset est vide, à changer
+    val_batches = tf.data.experimental.cardinality(validation_dataset)
+    test_dataset = validation_dataset.take(val_batches)
+    validation_dataset = validation_dataset.skip(val_batches)
+
     print("finished creating dataset")
 
-    return train, validation
+    #Cette partie est censée optimiser l'accès aux données,
+    # mais elle empêche leur affichage...
+
+
+    AUTOTUNE = tf.data.AUTOTUNE
+
+    train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
+    validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
+    test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
+
+
+    return train_dataset, test_dataset, validation_dataset
 
 # Pour vérifier que la création du dataset s'est bien passée
 # count limité à 32 à cause da la taille des batchs...
 
+
 def show_sample(ds,count):
-    plt.figure(figsize=(8,8))
-    for image, index in ds.take(1):
+    class_names = ds.class_names
+
+    plt.figure(figsize=(10, 10))
+    for images, labels in ds.take(1):
         for i in range(count):
-            plt.subplot(8,4,i+1)
-            plt.xticks([])
-            plt.yticks([])
-            plt.grid(False)
-            plt.imshow(image[i].numpy(), cmap=plt.get_cmap("gray"))
-            plt.xlabel(labels[index[i]])
+            ax = plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title(class_names[labels[i]])
+            plt.axis("off")
     plt.show()
 
-train, test = create_dataset(.8, 'grayscale')
-show_sample(train, 32)
+def show_shuffled_sample(ds):
+
+    data_augmentation = tf.keras.Sequential([
+        tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
+    )
+
+    for image, _ in ds.take(1):
+      plt.figure(figsize=(10, 10))
+      first_image = image[0]
+      for i in range(9):
+        ax = plt.subplot(3, 3, i + 1)
+        augmented_image = data_augmentation(tf.expand_dims(first_image, 0))
+        plt.imshow(augmented_image[0] / 255)
+        plt.axis('off')
+
+    plt.show()
+
+
+def create_model(ds):
+    print("Start creating model")
+    preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
+
+    data_augmentation = tf.keras.Sequential([
+        tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
+    )
+
+    #Ici on importe MobileNetV2 et on le gèle
+    base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
+                                                   include_top=False,
+                                                   weights='imagenet')
+
+    base_model.trainable = False
+
+    global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
+
+
+    prediction_layer = tf.keras.layers.Dense(len(ds.class_names), activation=tf.keras.activations.softmax)
+
+    inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
+
+    x = data_augmentation(inputs)
+    x = preprocess_input(x)
+    x = base_model(x, training=False)
+    x = global_average_layer(x)
+    x = tf.keras.layers.Dropout(0.2)(x)
+    output = prediction_layer(x)
+
+    model = tf.keras.Model(inputs, output)
+
+    print("Finished creating model")
+    print("Compiling model")
+
+    base_learning_rate = 0.0001
+
+    #Voir si on peut changer la fonction de perte
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=base_learning_rate),
+                  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+                  metrics=['accuracy'])
+
+    print(model.summary())
+    return model
 
 
 
+train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
+
+model = create_model(train_dataset)
+
+initial_epochs = 10
+
+history = model.fit(train_dataset,
+          validation_data=validation_dataset,
+          epochs=initial_epochs)
 

@@ -21,6 +21,7 @@ IMG_SHAPE = IMG_SIZE + (3,)
 # Un peu inutile car cette fonctionnalité est incluse
 # dans la fonction image_dataset_from_directory...
 
+
 def resize(source_path, target_path):
     count = 0
     size = (480, 480)
@@ -69,23 +70,23 @@ def create_dataset(val_split, clrmd):
         validation_split=val_split, subset='validation', seed=3
     )
 
-    #Validation_dataset est vide, à changer
+
     val_batches = tf.data.experimental.cardinality(validation_dataset)
-    test_dataset = validation_dataset.take(val_batches)
-    validation_dataset = validation_dataset.skip(val_batches)
+    test_dataset = validation_dataset.take(val_batches // 5)
+    validation_dataset = validation_dataset.skip(val_batches // 5)
 
     print("finished creating dataset")
 
     #Cette partie est censée optimiser l'accès aux données,
     # mais elle empêche leur affichage...
 
-    '''
+
     AUTOTUNE = tf.data.AUTOTUNE
 
     train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
     validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
     test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
-    '''
+
 
     return train_dataset, test_dataset, validation_dataset
 
@@ -93,7 +94,7 @@ def create_dataset(val_split, clrmd):
 # count limité à 32 à cause da la taille des batchs...
 
 
-def show_sample(ds,count):
+def show_sample(ds, count):
     class_names = ds.class_names
 
     plt.figure(figsize=(10, 10))
@@ -104,6 +105,7 @@ def show_sample(ds,count):
             plt.title(class_names[labels[i]])
             plt.axis("off")
     plt.show()
+
 
 def show_shuffled_sample(ds):
 
@@ -126,6 +128,9 @@ def show_shuffled_sample(ds):
 
 def create_model(ds):
     print("Start creating model")
+
+    fine_tune_at = 100
+
     preprocess_input = tf.keras.applications.mobilenet_v2.preprocess_input
 
     data_augmentation = tf.keras.Sequential([
@@ -133,17 +138,23 @@ def create_model(ds):
         tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
     )
 
-    #Ici on importe MobileNetV2 et on le gèle
+    # Ici on importe MobileNetV2 et on le gèle
+
     base_model = tf.keras.applications.MobileNetV2(input_shape=IMG_SHAPE,
                                                    include_top=False,
                                                    weights='imagenet')
 
-    base_model.trainable = False
+    # On entraine maintenant les couches sup de MobileNetV2
+
+    base_model.trainable = True
+
+    for layer in base_model.layers[:fine_tune_at]:
+        layer.trainable = False
 
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
 
 
-    prediction_layer = tf.keras.layers.Dense(len(ds.class_names), activation=tf.keras.activations.softmax)
+    prediction_layer = tf.keras.layers.Dense(443, activation=tf.keras.activations.softmax)
 
     inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
 
@@ -161,43 +172,54 @@ def create_model(ds):
 
     base_learning_rate = 0.0001
 
-    #Voir si on peut changer la fonction de perte
-    model.compile(optimizer=tf.keras.optimizers.Adam(lr=base_learning_rate),
+    # Voir si on peut changer la fonction de perte
+
+    model.compile(optimizer=tf.keras.optimizers.Adam(lr=base_learning_rate/10),
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
                   metrics=['accuracy'])
 
     print(model.summary())
     return model
 
-train_dataset, test_dataset, validation_dataset = create_dataset(.8, 'rgb')
+
+def train(model, train_ds, val_ds, num_epochs, verbose):
+    history = model.fit(train_ds,
+                        validation_data=val_ds,
+                        epochs=num_epochs)
+    if(verbose):
+        acc = history.history['accuracy']
+        val_acc = history.history['val_accuracy']
+
+        loss = history.history['loss']
+        val_loss = history.history['val_loss']
+
+        plt.figure(figsize=(8, 8))
+        plt.subplot(2, 1, 1)
+        plt.plot(acc, label='Training Accuracy')
+        plt.plot(val_acc, label='Validation Accuracy')
+        plt.legend(loc='lower right')
+        plt.ylabel('Accuracy')
+        plt.ylim([min(plt.ylim()), 1])
+        plt.title('Training and Validation Accuracy')
+
+        plt.subplot(2, 1, 2)
+        plt.plot(loss, label='Training Loss')
+        plt.plot(val_loss, label='Validation Loss')
+        plt.legend(loc='upper right')
+        plt.ylabel('Cross Entropy')
+        plt.ylim([0, 1.0])
+        plt.title('Training and Validation Loss')
+        plt.xlabel('epoch')
+        plt.show()
+
+
+train_dataset, test_dataset, validation_dataset = create_dataset(.2, 'rgb')
 
 model = create_model(train_dataset)
 
-initial_epochs = 1
+initial_epochs = 20
 
-history = model.fit(train_dataset,
-          validation_data=validation_dataset,
-          epochs=initial_epochs)
+train(model, train_dataset, validation_dataset, initial_epochs, verbose=True)
 
-acc = history.history['accuracy']
 
-loss = history.history['loss']
-
-plt.figure(figsize=(8, 8))
-plt.subplot(2, 1, 1)
-plt.plot(acc, label='Training Accuracy')
-plt.legend(loc='lower right')
-plt.ylabel('Accuracy')
-plt.ylim([min(plt.ylim()),1])
-plt.title('Training Accuracy')
-
-plt.subplot(2, 1, 2)
-plt.plot(loss, label='Training Loss')
-plt.legend(loc='upper right')
-plt.ylabel('Cross Entropy')
-plt.ylim([0,1.0])
-plt.title('Training Loss')
-plt.xlabel('epoch')
-plt.show()
-
-model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\my_model')
+model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 2')

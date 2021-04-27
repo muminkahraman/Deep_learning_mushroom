@@ -1,0 +1,5 @@
+Model 1 : Entrainé sur 20 epochs, précision qui plafonne à 40%, overfitting à partir de 6 epochs
+          MobileNetV2 totalement gelé
+
+Model 2 : Entrainé sur 20 epochs,
+          54 dernières couches de MobileNetV2 entrainables

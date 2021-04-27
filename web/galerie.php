@@ -37,7 +37,7 @@ $req= $conn->query('Select * from list_mush where mushroom like "'.$letter.'%" o
 echo "<div class='container-fluid'>";
 while($data = $req->fetch())
 {
-  echo "<div class='row'><div class='col-3'></div> <div class='col-6 text-center'><a href='#' class='text-white fs-4 text' style='text-decoration:none;'> ".$data[0]."  </a></div> <div class='col-3'></div></div>";
+  echo "<div class='row'><div class='col-3'></div> <div class='col-6 text-center'><a href='/?infoMush=on&name=".$data[0]."' class='text-white fs-4 text' style='text-decoration:none;'> ".$data[0]."  </a></div> <div class='col-3'></div></div>";
 }
 
 $req=null;

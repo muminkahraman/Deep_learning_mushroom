@@ -13,7 +13,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <a href="/?infoMush=on/Amanita_muscaria">Amanite Phalloïde</a>
+            <a href="/?infoMush=on&name=Amanita_muscaria">Amanite Phalloïde</a>
             <a href="/?infoMush=on/blabla"> Phalloïde</a>
           </div>
           <div class="modal-footer">

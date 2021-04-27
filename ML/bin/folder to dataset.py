@@ -1,11 +1,9 @@
 import os
-import shutil
-import sys
 
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import tensorflow as tf
+import tensorboard as tb
+import datetime
 from PIL import Image
 
 # A modifier en fonction de où sont rangées les photos
@@ -77,15 +75,11 @@ def create_dataset(val_split, clrmd):
 
     print("finished creating dataset")
 
-    #Cette partie est censée optimiser l'accès aux données,
-    # mais elle empêche leur affichage...
+    autotune = tf.data.AUTOTUNE
 
-
-    AUTOTUNE = tf.data.AUTOTUNE
-
-    train_dataset = train_dataset.prefetch(buffer_size=AUTOTUNE)
-    validation_dataset = validation_dataset.prefetch(buffer_size=AUTOTUNE)
-    test_dataset = test_dataset.prefetch(buffer_size=AUTOTUNE)
+    train_dataset = train_dataset.prefetch(buffer_size=autotune)
+    validation_dataset = validation_dataset.prefetch(buffer_size=autotune)
+    test_dataset = test_dataset.prefetch(buffer_size=autotune)
 
 
     return train_dataset, test_dataset, validation_dataset
@@ -100,7 +94,7 @@ def show_sample(ds, count):
     plt.figure(figsize=(10, 10))
     for images, labels in ds.take(1):
         for i in range(count):
-            ax = plt.subplot(3, 3, i + 1)
+            plt.subplot(3, 3, i + 1)
             plt.imshow(images[i].numpy().astype("uint8"))
             plt.title(class_names[labels[i]])
             plt.axis("off")
@@ -111,17 +105,19 @@ def show_shuffled_sample(ds):
 
     data_augmentation = tf.keras.Sequential([
         tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomFlip('vertical'),
+        tf.keras.layers.experimental.preprocessing.RandomContrast(0.1, seed=3),
         tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
     )
 
     for image, _ in ds.take(1):
-      plt.figure(figsize=(10, 10))
-      first_image = image[0]
-      for i in range(9):
-        ax = plt.subplot(3, 3, i + 1)
-        augmented_image = data_augmentation(tf.expand_dims(first_image, 0))
-        plt.imshow(augmented_image[0] / 255)
-        plt.axis('off')
+        plt.figure(figsize=(10, 10))
+        first_image = image[0]
+        for i in range(9):
+            plt.subplot(3, 3, i + 1)
+            augmented_image = data_augmentation(tf.expand_dims(first_image, 0))
+            plt.imshow(augmented_image[0] / 255)
+            plt.axis('off')
 
     plt.show()
 
@@ -135,6 +131,8 @@ def create_model(ds):
 
     data_augmentation = tf.keras.Sequential([
         tf.keras.layers.experimental.preprocessing.RandomFlip('horizontal'),
+        tf.keras.layers.experimental.preprocessing.RandomFlip('vertical'),
+        tf.keras.layers.experimental.preprocessing.RandomContrast(0.1, seed=3),
         tf.keras.layers.experimental.preprocessing.RandomRotation(0.2)]
     )
 
@@ -153,7 +151,6 @@ def create_model(ds):
 
     global_average_layer = tf.keras.layers.GlobalAveragePooling2D()
 
-
     prediction_layer = tf.keras.layers.Dense(443, activation=tf.keras.activations.softmax)
 
     inputs = tf.keras.Input(shape=(IMG_SIZE[0], IMG_SIZE[1], 3))
@@ -162,7 +159,7 @@ def create_model(ds):
     x = preprocess_input(x)
     x = base_model(x, training=False)
     x = global_average_layer(x)
-    x = tf.keras.layers.Dropout(0.2)(x)
+    x = tf.keras.layers.Dropout(0.5)(x)
     output = prediction_layer(x)
 
     model = tf.keras.Model(inputs, output)
@@ -179,38 +176,27 @@ def create_model(ds):
                   metrics=['accuracy'])
 
     print(model.summary())
+
     return model
 
 
 def train(model, train_ds, val_ds, num_epochs, verbose):
-    history = model.fit(train_ds,
-                        validation_data=val_ds,
-                        epochs=num_epochs)
-    if(verbose):
-        acc = history.history['accuracy']
-        val_acc = history.history['val_accuracy']
 
-        loss = history.history['loss']
-        val_loss = history.history['val_loss']
+    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-        plt.figure(figsize=(8, 8))
-        plt.subplot(2, 1, 1)
-        plt.plot(acc, label='Training Accuracy')
-        plt.plot(val_acc, label='Validation Accuracy')
-        plt.legend(loc='lower right')
-        plt.ylabel('Accuracy')
-        plt.ylim([min(plt.ylim()), 1])
-        plt.title('Training and Validation Accuracy')
+    if verbose:
+        history = model.fit(train_ds,
+                            validation_data=val_ds,
+                            epochs=num_epochs,
+                            callbacks=tensorboard_callback)
+    else:
+        history = model.fit(train.ds,
+                            validation_data=val_ds,
+                            epochs=num_epochs)
 
-        plt.subplot(2, 1, 2)
-        plt.plot(loss, label='Training Loss')
-        plt.plot(val_loss, label='Validation Loss')
-        plt.legend(loc='upper right')
-        plt.ylabel('Cross Entropy')
-        plt.ylim([0, 1.0])
-        plt.title('Training and Validation Loss')
-        plt.xlabel('epoch')
-        plt.show()
+
+
 
 
 train_dataset, test_dataset, validation_dataset = create_dataset(.2, 'rgb')
@@ -222,4 +208,4 @@ initial_epochs = 20
 train(model, train_dataset, validation_dataset, initial_epochs, verbose=True)
 
 
-model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 2')
+model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 5')

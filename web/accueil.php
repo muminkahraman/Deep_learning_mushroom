@@ -14,7 +14,6 @@
           </div>
           <div class="modal-body">
             <a href="/?infoMush=on&name=Amanita_muscaria">Amanite Phalloïde</a>
-            <a href="/?infoMush=on/blabla"> Phalloïde</a>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>

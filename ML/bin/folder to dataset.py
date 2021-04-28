@@ -2,7 +2,6 @@ import os
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
-import tensorboard as tb
 import datetime
 from PIL import Image
 
@@ -182,7 +181,7 @@ def create_model(ds):
 
 def train(model, train_ds, val_ds, num_epochs, verbose):
 
-    log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+    log_dir = "../logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
     tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
     if verbose:
@@ -191,21 +190,29 @@ def train(model, train_ds, val_ds, num_epochs, verbose):
                             epochs=num_epochs,
                             callbacks=tensorboard_callback)
     else:
-        history = model.fit(train.ds,
+        history = model.fit(train_ds,
                             validation_data=val_ds,
                             epochs=num_epochs)
 
 
-
-
-
 train_dataset, test_dataset, validation_dataset = create_dataset(.2, 'rgb')
 
+# Pour l'entrainement
+
+'''
 model = create_model(train_dataset)
 
-initial_epochs = 20
+initial_epochs = 40
 
 train(model, train_dataset, validation_dataset, initial_epochs, verbose=True)
 
 
-model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 5')
+model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 6')
+'''
+
+new_model = tf.keras.models.load_model("../saved_models/Model 6")
+log_dir = "../logs/evaluate/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
+
+loss, acc = new_model.evaluate(test_dataset, callbacks=tensorboard_callback)
+print('Restored model, accuracy: {:5.2f}%'.format(100 * acc))

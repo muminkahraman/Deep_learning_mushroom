@@ -6,12 +6,17 @@ Model 2 : Entrainé sur 20 epochs, précision qui plafonne à 42% (sur l'ensembl
           overfitting à partir d'environ 12 epochs
           54 dernières couches de MobileNetV2 entrainables
 
-Model 3 : Entrainé sur 20 epochs, précision qui plafonne à 45% (sur l'ensemble de validation)
+Model 3 : Entrainé sur 20 epochs, précision qui plafonne à 44.3% (sur l'ensemble de validation)
           overfitting à partir de 13 epochs
           54 dernières couches de MobileNetV2 entrainables
           Plus d'augmentation des données
 
-Model 4 : Plafonne à 45% également, mais overfitting à partir de la 19ème epoch seulement
+Model 4 : Plafonne à 44.2% également, mais overfitting à partir de la 19ème epoch seulement
           Model 3 + Dropout à 0.3 au lieu de 0.2
 
-Model 5 : Model 3 + Dropout à 0.5 au lieu de 0.2
+Model 5 : Plafonne à 42% mais sans overfitting, il faudrait l'entrainer sur quelques epochs supplémentaires
+          Model 3 + Dropout à 0.5 au lieu de 0.2
+
+Model 6 : Plafonne à 49%. Overfitting à partir de la 31ème epoch
+          Model 3 + Dropout à 0.5 au lieu de 0.2
+          Entrainement sur 40 epochs

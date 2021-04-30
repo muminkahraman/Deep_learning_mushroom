@@ -32,7 +32,7 @@
     <form action="#">
       <div id="drop_zone" class="circle white" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
         <img draggable="false" class="shroom" src="ressources/image/shroomCrop.png"/>
-        <input id="inputIMG" type="file" name="file" size="1"  accept="image/png"/>
+        <input id="inputIMG" type="file" name="file" size="1"  accept="image/jpg"/>
       </div>
     </form>
 

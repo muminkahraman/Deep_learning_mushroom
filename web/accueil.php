@@ -14,7 +14,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body" id="body">
-            <img id="imgOutput" height="200" width="200" src="./ressources/image/shroom.png">
+            <img id="imgOutput" height="200" width="200" src="">
             <table class="table table striped">
               <thead>
                 <tr><th>Nom du champignon</th><th>Pourcentage de fiabilité</th>
@@ -33,7 +33,7 @@
       <form action="#">
         <div id="drop_zone" class="circle white" ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
           <img draggable="false" class="shroom" src="ressources/image/shroomCrop.png"/>
-          <input id="inputIMG" type="file" name="file" size="1" onchange="onFileSelected(event);"/>
+          <button id="predictBtn">Predict </button>
         </div>
       </form>
 
@@ -89,69 +89,104 @@
         };
         reader.readAsDataURL(input.files[0]);
 
-        const output = document.getElementById('imgOutput');
-        const tfImg = tf.browser.fromPixels(output);
-        const smallImg = tf.image.resizeBilinear(tfImg, [224,224]);
-        const resized = tf.cast(smallImg, 'float32');
-        const t4d = tf.tensor4d(Array.from(resized.dataSync()),[1,224,224,3])
+        $('#mushModal').modal('show');
+      };
 
 
-        async function load() {
-          const model = await tf.loadGraphModel('ressources/model/model.json');
-          return model;
-        };
 
-        function predict(model)
-        {
-          let top3 = [];
-          model.then(model=>
+      $("#predictBtn").click(async function () {
+        let image = $('#imgOutput').get(0);
+
+        let pre_image = tf.browser.fromPixels(image, 3)
+        .resizeNearestNeighbor([224, 224])
+        .expandDims()
+        .toFloat()
+        let predict = await model.predict(pre_image).data();
+        console.log(predict);
+        let order = Array.from(predict_result)
+        .map(function (p, i) {
+          return {
+            probability: p,
+            className: Result[i]
+          };
+        }).sort(function (a, b) {
+          return b.probability - a.probability;
+        }).slice(0, 2);
+
+        $("#list").empty();
+        order.forEach(function (p) {
+          $("#list").append(`<li>${p.className}: ${parseInt(Math.trunc(p.probability * 100))} %</li>`);
+        });
+      });
+
+
+
+
+      const output = document.getElementById('imgOutput');
+      console.log(output);
+      const tfImg = tf.browser.fromPixels(output);
+      const smallImg = tf.image.resizeBilinear(tfImg, [224,224]);
+      const resized = tf.cast(smallImg, 'float32');
+      const t4d = tf.tensor4d(Array.from(resized.dataSync()),[1,224,224,3])
+
+
+      async function load() {
+        const model = await tf.loadGraphModel('ressources/model/model.json');
+        return model;
+      };
+
+      function predict(model)
+      {
+        let top3 = [];
+        model.then(model=>
+          {
+            let result = model.predict(t4d).data();
+            result.then(function(res)
             {
-              let result = model.predict(t4d).data();
-              result.then(function(res)
+              res.forEach(function(item,i)
               {
-                res.forEach(function(item,i)
-                {
-                  top3.push( { name: classM[i], prob : item });
+                top3.push( { name: classM[i], prob : item });
 
-                });
+              });
 
-                top3.sort(function(a,b)
-                {
-                  return b.prob - a.prob ;
-                })
+              top3.sort(function(a,b)
+              {
+                return b.prob - a.prob ;
+              })
 
-                top3 = top3.slice(0,3);
-                let tbody = document.getElementById("tableBody");
-                top3.forEach(function(item)
-                {
-                  let p = Math.round(item.prob*10000)/100;
-                  var newRow = tbody.insertRow();
-                  var nameCell = newRow.insertCell();
-                  nameCell.appendChild(document.createTextNode(item.name));
-                  var probCell = newRow.insertCell();
-                  probCell.appendChild(document.createTextNode(p));
-                });
-
-
+              top3 = top3.slice(0,3);
+              let tbody = document.getElementById("tableBody");
+              top3.forEach(function(item)
+              {
+                let p = Math.round(item.prob*10000)/100;
+                var newRow = tbody.insertRow();
+                var nameCell = newRow.insertCell();
+                nameCell.appendChild(document.createTextNode(item.name));
+                var probCell = newRow.insertCell();
+                probCell.appendChild(document.createTextNode(p));
               });
 
 
             });
 
 
+          });
 
-          };
-          const model = load();
 
-          predict(model);
 
-          $('#mushModal').modal('show');
         };
+        const model = load();
+
+        predict(model);
+
+        $('#mushModal').modal('show');
+
+
 
 
         var myModalEl = document.getElementById('mushModal')
         myModalEl.addEventListener('hidden.bs.modal', function (event) {
-          // do something...
+          let tbody = document.getElementById("tableBody");
         })
 
         </script>

@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import datetime
 from PIL import Image
-
 # A modifier en fonction de où sont rangées les photos
 
 
@@ -73,13 +72,13 @@ def create_dataset(val_split, clrmd):
     validation_dataset = validation_dataset.skip(val_batches // 5)
 
     print("finished creating dataset")
-
+    '''
     autotune = tf.data.AUTOTUNE
 
     train_dataset = train_dataset.prefetch(buffer_size=autotune)
     validation_dataset = validation_dataset.prefetch(buffer_size=autotune)
     test_dataset = test_dataset.prefetch(buffer_size=autotune)
-
+    '''
 
     return train_dataset, test_dataset, validation_dataset
 
@@ -88,7 +87,7 @@ def create_dataset(val_split, clrmd):
 
 
 def show_sample(ds, count):
-    class_names = ds.class_names
+    class_names = os.listdir(target)
 
     plt.figure(figsize=(10, 10))
     for images, labels in ds.take(1):
@@ -195,6 +194,20 @@ def train(model, train_ds, val_ds, num_epochs, verbose):
                             epochs=num_epochs)
 
 
+def show_predictions(model, ds, count):
+    class_names = os.listdir(target)
+    plt.figure(figsize=(10, 10))
+    predictions = tf.math.argmax(model.predict(ds.take(1)))
+
+    for images, labels in ds.take(1):
+        for i in range(count):
+            plt.subplot(3, 3, i + 1)
+            plt.imshow(images[i].numpy().astype("uint8"))
+            plt.title("Pred : " + class_names[predictions[i]] + "/n" + "label : " + class_names[labels[i]])
+            plt.axis("off")
+    plt.show()
+
+
 train_dataset, test_dataset, validation_dataset = create_dataset(.2, 'rgb')
 
 # Pour l'entrainement
@@ -210,9 +223,6 @@ train(model, train_dataset, validation_dataset, initial_epochs, verbose=True)
 model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 6')
 '''
 
-new_model = tf.keras.models.load_model("../saved_models/Model 6")
-log_dir = "../logs/evaluate/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
-tensorboard_callback = tf.keras.callbacks.TensorBoard(log_dir=log_dir, histogram_freq=1)
 
-loss, acc = new_model.evaluate(test_dataset, callbacks=tensorboard_callback)
-print('Restored model, accuracy: {:5.2f}%'.format(100 * acc))
+new_model = tf.keras.models.load_model("../saved_models/Model 6")
+show_predictions(new_model, test_dataset, 9)

@@ -1,9 +1,8 @@
-<div style="height:50px;"></div>
 <div class="container-fluid">
   <div class="row text-center">
     <div class="col-3"></div>
     <div class="col-6">
-      <h2 class="display-2" id="mushName"></h2>
+      <h2 class="display-2 title1" id="mushName"></h2>
     </div>
     <div class="col-3"></div>
   </div>

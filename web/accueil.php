@@ -4,7 +4,7 @@
 
 
 
-    <!-- Modal -->
+    <!-- Modal/ popup qui s'affiche lorsque l'utilisateur upload une image -->
     <div class="modal fade" id="mushModal" tabindex="-1" aria-labelledby="labelMushModal" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -37,7 +37,7 @@
     </form>
 
     <script>
-
+    //fonctions qui prennent charge le drop file
     function dragOverHandler(ev) {
       console.log('File(s) in drop zone');
       ev.preventDefault();
@@ -52,7 +52,6 @@
 
       if (ev.dataTransfer.items)
       {
-        // Use DataTransferItemList interface to access the file(s)
         for (var i = 0; i < ev.dataTransfer.items.length; i++) {
           // If dropped items aren't files, reject them
           if (ev.dataTransfer.items[i].kind === 'file') {
@@ -63,14 +62,12 @@
       }
       else
       {
-        // Use DataTransfer interface to access the file(s)
         for (var i = 0; i < ev.dataTransfer.files.length; i++)
         {
           console.log('... file[' + i + '].name = ' + ev.dataTransfer.files[i].name);
         }
       }
-
-
+      
       let reader = new FileReader();
       reader.onload = function () {
         let dataURL = reader.result;
@@ -84,7 +81,8 @@
 
     }
 
-
+  //lors de l'ajout manuel d'une image cela declenche cette fonction
+  //lit l'image puis l'insere sur le site
     $("#inputIMG").change(function () {
       let reader = new FileReader();
       reader.onload = function () {
@@ -94,39 +92,43 @@
       }
       let file = $("#inputIMG").prop("files")[0];
       reader.readAsDataURL(file);
-
+      //affichage du modal
       $('#mushModal').modal('show');
 
     });
 
+    //chargement du model en asynchrone, 
     let model;
     (async function () {
       model = await tf.loadGraphModel('ressources/model/model.json');
-      $(".progress-bar").hide();
     })();
 
-
+    //dès que le bouton predict est cliqué cela déclenche le processus de prediction
+    
     $("#predictBtn").click(async function () {
       let btn = document.getElementById("predictBtn");
       btn.classList.add("disabled");
       let image = $('#imgOutput').get(0);
-
+      //recupere l'image puis l'adapte au format 224 par 224
       let pre_image = tf.browser.fromPixels(image, 3)
       .resizeNearestNeighbor([224, 224])
       .expandDims()
       .toFloat()
+      
+      //les resultats sont dans cette variable
       let predict_result = await model.predict(pre_image).data();
-
+      
+      //tableau contenant probabilité + la classe de champignon
       let order = Array.from(predict_result)
       .map(function (p, i) {
         return {
           prob: p,
           name: classM[i]
-        };
+        };  //tri selon la probabilité et on ne garde que les 3 meilleurs résultats
       }).sort(function (a, b) {
         return b.prob - a.prob;
       }).slice(0, 3);
-
+    //ajout de la table dans le modal
       var table = document.getElementById("table");
       let tbody = document.getElementById("tableBody");
       var thead= document.createElement('thead');
@@ -158,7 +160,7 @@
     });
 
 
-
+    //quand le modal est clos cela supprime tout ce qui est présent
     var myModalEl = document.getElementById('mushModal')
     myModalEl.addEventListener('hidden.bs.modal', function (event) {
       var thead = document.getElementById("thead");
@@ -171,10 +173,8 @@
       let btn = document.getElementById("predictBtn");
       btn.classList.remove("disabled");
     })
-
-  </script>
-
-  <script>
+   
+      //animation breathing au centre de la page
   var circleBreath = anime({
     targets: '.back',
     scale:0.90,

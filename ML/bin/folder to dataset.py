@@ -2,8 +2,12 @@ import os
 
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import numpy as np
 import datetime
 from PIL import Image
+import itertools
+import io
+import sklearn
 # A modifier en fonction de où sont rangées les photos
 
 
@@ -223,6 +227,4 @@ train(model, train_dataset, validation_dataset, initial_epochs, verbose=True)
 model.save(r'D:\Documents\Cours\L3 INFO\LIFPROJET\Deep_learning_mushroom\ML\saved_models\Model 6')
 '''
 
-
-new_model = tf.keras.models.load_model("../saved_models/Model 6")
-show_predictions(new_model, test_dataset, 9)
+show_shuffled_sample(train_dataset)

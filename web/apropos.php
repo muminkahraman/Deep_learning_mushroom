@@ -11,6 +11,7 @@
         En particulier nous nous sommes restreints au cas des champignons.
         En effet il est plutôt difficile pour un novice de différencier entre elles certaines espèces de champignons, et il existe déjà sur le marché de nombreuses solutions basées sur l’intelligence artificielle.
         Nous avons décidé d’allier intelligence artificielle et développement web afin de proposer un projet accessible facilement à l’utilisateur.
+      </p>
     </div>
     <div class="col-2"></div>
   </div>

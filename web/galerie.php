@@ -8,6 +8,8 @@
 </div>
 
 <script>
+  //classM = classes de tous les champignons 
+  //Pour chaque classe créé des elements HTML et les insere sur la page
 classM.forEach(function(item) {
   var body =document.getElementById("body");
   var row = document.createElement("row");

@@ -37,7 +37,7 @@
           </i>
         </a>
 
-
+<!-- burger menu  --->
         <ul class="dropdown-menu">
           <?php
           if ($_SERVER['REQUEST_URI'] == "/?accueil=on")
@@ -79,12 +79,13 @@
 </div>
 </div>
 <?php
+//permet d'inclure dans la page ces différentes pages
 if (get("galerie")) include("galerie.php");
 elseif (get("apropos")) include("apropos.php");
 elseif (get("infoMush")) include("infoMush.php");
 else include("accueil.php");
 ?>
-
+<!-- footer -->
 <footer class="navbar fixed-bottom text-center">
   <div class="col-3">
   </div>

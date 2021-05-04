@@ -51,5 +51,5 @@ Le plus performant étant le modèle 6, nous n'avons pas sauvegardé les suivant
 
 
 
-## Résultats : 
+## Résultats
 Le résultat se trouve sur le site http://mumin.fr/
